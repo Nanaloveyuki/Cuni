@@ -9,7 +9,6 @@
 __version__: str = "1.0.0"
 
 from .utils import Logger, g_colorize, g_get_terminal_compatible_color
-from .core import g_msg_analyzer
 from .core_adapters import g_start_websocket_server, g_run
 
 __all__: list[str] = [
@@ -18,5 +17,4 @@ __all__: list[str] = [
     "Logger",
     "g_start_websocket_server",
     "g_run",
-    "g_msg_analyzer",
 ]
