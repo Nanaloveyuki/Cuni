@@ -1,6 +1,6 @@
 """
 @author: Annarocia
-@date: 2025-10-19
+@date: 2025-10-21
 @description: 配置模块
 @python: 3.14.0 --nogil
 @cunimi: L2
@@ -10,12 +10,16 @@ import json
 from typing import Any
 from ..utils.a_logger import Logger
 from os.path import exists
-
 logger = Logger("Config", level="debug")
 configs: dict[str, Any] = {
     "host": "localhost",
     "port": 8765,
     "max_cpu_workers": 4,
+    "process_timeout": 10,
+    "restart_delay": 1.0,
+    "log_level": "debug",
+    "use_process_pool": False,
+    "max_input_queue_size": 65535,
 }
 logger.trace("配置模块初始化")
 DEFAULT_CONFIG_PATH: str = "./settings.json" 

@@ -1,0 +1,10 @@
+{
+    "host": "localhost",
+    "port": 8765,
+    "max_cpu_workers": 4,
+    "process_timeout": 10,
+    "restart_delay": 1.0,
+    "log_level": "trace",
+    "use_process_pool": false,
+    "max_input_queue_size": 65535
+}
