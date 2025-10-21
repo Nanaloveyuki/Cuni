@@ -1,11 +1,12 @@
 """
 @author: Annarocia
-@date: 2025-10-19
+@date: 2025-10-21
 @description: 日志模块
 @python: 3.14.0 --nogil
 @cunimi: L2
 """
 
+from threading import current_thread
 from typing import Any, Mapping, Optional
 from dataclasses import dataclass, field
 from types import MappingProxyType
@@ -81,30 +82,37 @@ class Logger:
     """
     def __init__(self, logger_name: str = "", log_level: int = 10, level: Optional[str] = None):
         self.name: str = logger_name
-        self.level_map: Mapping[str, int] = LoggerLevel().level_map
         self.colors = LoggerColor()
+        self.level_name_map: list[str]= []
+        for key in LoggerLevel().level_map.keys():
+            self.level_name_map.append(key)
+        self.level_map: Mapping[str, int] = LoggerLevel().level_map
         
-        if level is not None:
-            if level in self.level_map:
-                self.level: int = self.level_map[level]
-            else:
-                self.level: int = log_level
-        else:
-            self.level: int = log_level
+        def _norm(lvl):
+            if isinstance(lvl, int):
+                return lvl
+            if isinstance(lvl, str) and lvl in self.level_map:
+                return self.level_map[lvl]
+            return self.level_map["debug"]  # 默认
+
+        self.level: int = _norm(level if level is not None else log_level)
 
     def _format_msg(self, msg: Any, current_level: str, no_color: bool) -> str:
         """格式化日志消息"""
+        now_thread: str = ""
         if no_color:
             return f"{self.name} {g_get_time("%H:%M:%S.%f")} [{current_level}] {msg}"
         else:
             if hasattr(self.colors, current_level):
+                if current_level == "trace":
+                    now_thread: str = f":{g_colorize(f"{current_thread().name}", foreground=getattr(self.colors, "name_color"))}"
                 front_part: str = f"{g_colorize(f"{self.name}", foreground=getattr(self.colors, "name_color"))}"
                 middle_part: str = f"{g_colorize(f"[{current_level}]", foreground=getattr(self.colors, current_level))}"
                 time_part: str = f"{g_colorize(f"{g_get_time("%H:%M:%S.%f")}", foreground=getattr(self.colors, "time_color"))}"
                 # todo msg正则表达+颜色格式化
-                return f"{front_part} {time_part} {middle_part} >> {msg}"
+                return f"{front_part}{now_thread} {time_part} {middle_part} >> {msg}"
             else:
-                return g_colorize(f"{self.name} {g_get_time("%H:%M:%S.%f")} [{current_level}] {msg}", foreground=self.colors.unknown)
+                return g_colorize(f"{self.name}{now_thread} {g_get_time("%H:%M:%S.%f")} [{current_level}] {msg}", foreground=self.colors.unknown)
 
     def _print_msg(self, msg: str) -> None:
         print(msg)
